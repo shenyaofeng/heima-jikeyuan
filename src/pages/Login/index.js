@@ -1,16 +1,21 @@
 import "./index.scss";
-import { Card, Form, Input, Button } from "antd";
+import { Card, Form, Input, Button,message } from "antd";
 import logo from "@/assets/logo.png";
 import { useDispatch } from "react-redux";
 import { fetchLogin } from "@/store/modules/user";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const dispatch = useDispatch();
-  
+  const navigate = useNavigate();
   // 获取表单内容
-  const onFinish = (values) => {
-    console.log("Success:", values);
-    dispatch(fetchLogin(values))
+  const onFinish = async (values) => {
+    // 只用登陆成功后才会跳转到首页，async await
+    await dispatch(fetchLogin(values))
+    // 登录成功后跳转到首页
+    navigate("/")
+    // 提示下用户
+    message.success("登录成功")
   }
   return (
     <div className="login">
