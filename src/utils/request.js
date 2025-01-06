@@ -1,6 +1,6 @@
 //axios请求封装
 import axios from 'axios'
-
+import {getToken} from '@/utils/'
 //根域名配置，超时事件
 //请求拦截器
 //响应拦截器
@@ -14,6 +14,10 @@ const request = axios.create({
 request.interceptors.request.use(
   function (config) {
     // 在发送请求之前做些什么
+    const token = getToken()
+    if(token){
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config;
   },
   function (error) {
