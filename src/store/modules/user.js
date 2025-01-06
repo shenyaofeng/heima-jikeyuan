@@ -4,11 +4,12 @@ import { createSlice } from "@reduxjs/toolkit";
 const userStore = createSlice({
   name:'user',
   initialState:{
-    token:''
+    token: localStorage.getItem('token_key') || ''
   },
   reducers:{
     setToken(state,action){
       state.token = action.payload
+      localStorage.setItem('token_key',action.payload)
     }
   }
 })
@@ -19,10 +20,8 @@ const { setToken } = userStore.actions
 const fetchLogin = (loginForm) => {
   return async (dispatch) => {
     // 发送请求
-    console.log(loginForm);
     const res = await request.post("/authorizations",loginForm);
     // 成功后，调用setToken方法
-    console.log(res);
     dispatch(setToken(res.data.token))
   }
 }
