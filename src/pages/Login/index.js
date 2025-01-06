@@ -3,12 +3,16 @@ import { Card, Form, Input, Button } from "antd";
 import logo from "@/assets/logo.png";
 
 const Login = () => {
+  // 获取表单内容
+  const onFinish = (values) => {
+    console.log("Success:", values);
+  }
   return (
     <div className="login">
       <Card className="login-container">
         <img className="login-logo" src={logo} alt="" />
         {/* 登录表单 */}
-        <Form validateTrigger="onBlur">
+        <Form onFinish={onFinish} validateTrigger="onBlur">
           <Form.Item
             name="mobile"
             rules={[
@@ -20,7 +24,7 @@ const Login = () => {
               {
                 pattern: /^1[3-9]\d{9}$/,
                 message: "请输入正确的手机号",
-              }
+              },
             ]}
           >
             <Input size="large" placeholder="请输入手机号" />
