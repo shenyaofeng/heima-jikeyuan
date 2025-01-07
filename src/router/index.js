@@ -1,6 +1,5 @@
 import Layout from '../pages/Layout/index'
 // import Login from "@/pages/Login";
-
 // import Login from "../pages/Login/index";
 import Login from "@/pages/Login/index";
 import Home from '@/pages/Home';
