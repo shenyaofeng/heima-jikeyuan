@@ -15,20 +15,14 @@ import { Link } from "react-router-dom";
 import "./index.scss";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useEffect, useState } from "react";
-import { getChannelAPI, createArticleAPI } from "@/apis/article";
+import { useState } from "react";
+import { createArticleAPI } from "@/apis/article";
+import { useChannel } from "@/hooks/useChannel";
 const { Option } = Select;
 
 const Publish = () => {
-  // 获取频道列表
-  const [channelList, setChannelList] = useState([]);
-  useEffect(() => {
-    const getChannelList = async () => {
-      const res = await getChannelAPI();
-      setChannelList(res.data.channels);
-    };
-    getChannelList();
-  }, []);  
+  //获取频道列表
+  const { channelList } = useChannel();
   // 提交文章表单
   const onFinish = async (values) => {
     if(imageType !== imageList.length) return message.error("封面图片与数量不匹配");
