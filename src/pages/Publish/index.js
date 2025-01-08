@@ -15,20 +15,37 @@ import "./index.scss";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useEffect, useState } from "react";
-import {getChannelAPI} from "@/apis/article"
+import { getChannelAPI, createArticleAPI } from "@/apis/article";
+import { Content } from "antd/es/layout/layout";
 const { Option } = Select;
 
 const Publish = () => {
   //
-  useEffect(()=>{
+  useEffect(() => {
     const getChannelList = async () => {
-      const res = await getChannelAPI()
-      setChannelList(res.data.channels)
-    }
-    getChannelList()
-  },[])
-  // 
-  const [channelList,setChannelList] = useState([])
+      const res = await getChannelAPI();
+      setChannelList(res.data.channels);
+    };
+    getChannelList();
+  }, []);
+  //
+  const [channelList, setChannelList] = useState([]);
+  //
+  const onFinish = async (values) => {
+    const {title,content,channel_id} = values
+    console.log("Success:", values);
+    const reqData = {
+      title,
+      content,
+      cover: {
+        type: 0,
+        images: [],
+      },
+      channel_id,
+    };
+    
+    await createArticleAPI(reqData);
+  };
   return (
     <div className="publish">
       <Card
@@ -45,6 +62,7 @@ const Publish = () => {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 16 }}
           initialValues={{ type: 1 }}
+          onFinish={onFinish}
         >
           <Form.Item
             label="标题"
@@ -60,7 +78,9 @@ const Publish = () => {
           >
             <Select placeholder="请选择文章频道" style={{ width: 400 }}>
               {channelList.map((item) => (
-                <Option key={item.id}  value={item.id}>{item.name}</Option>
+                <Option key={item.id} value={item.id}>
+                  {item.name}
+                </Option>
               ))}
             </Select>
           </Form.Item>
