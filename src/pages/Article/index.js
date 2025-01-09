@@ -20,59 +20,65 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Article = () => {
+  //文章状态
+  const status = {
+    1:<Tag color="warning">待审核</Tag>,
+    2:<Tag color="green">审核通过</Tag>,
+    3:<Tag color="red">审核失败</Tag>
+  }
   const columns = [
-     {
-       title: "封面",
-       dataIndex: "cover",
-       width: 120,
-       render: (cover) => {
-         return (
-           <img src={cover.images[0] || img404} width={80} height={60} alt="" />
-         );
-       },
-     },
-     {
-       title: "标题",
-       dataIndex: "title",
-       width: 220,
-     },
-     {
-       title: "状态",
-       dataIndex: "status",
-       render: (data) => <Tag color="green">审核通过</Tag>,
-     },
-     {
-       title: "发布时间",
-       dataIndex: "pubdate",
-     },
-     {
-       title: "阅读数",
-       dataIndex: "read_count",
-     },
-     {
-       title: "评论数",
-       dataIndex: "comment_count",
-     },
-     {
-       title: "点赞数",
-       dataIndex: "like_count",
-     },
-     {
-       title: "操作",
-       render: (data) => {
-         return (
-           <Space size="middle">
-             <Button type="primary" shape="circle" icon={<EditOutlined />} />
-             <Button
-               type="primary"
-               danger
-               shape="circle"
-               icon={<DeleteOutlined />}
-             />
-           </Space>
-         );
-       },
-     },
+    {
+      title: "封面",
+      dataIndex: "cover",
+      width: 120,
+      render: (cover) => {
+        return (
+          <img src={cover.images[0] || img404} width={80} height={60} alt="" />
+        );
+      },
+    },
+    {
+      title: "标题",
+      dataIndex: "title",
+      width: 220,
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      render: (data) => status[data]
+    },
+    {
+      title: "发布时间",
+      dataIndex: "pubdate",
+    },
+    {
+      title: "阅读数",
+      dataIndex: "read_count",
+    },
+    {
+      title: "评论数",
+      dataIndex: "comment_count",
+    },
+    {
+      title: "点赞数",
+      dataIndex: "like_count",
+    },
+    {
+      title: "操作",
+      render: (data) => {
+        return (
+          <Space size="middle">
+            <Button type="primary" shape="circle" icon={<EditOutlined />} />
+            <Button
+              type="primary"
+              danger
+              shape="circle"
+              icon={<DeleteOutlined />}
+            />
+          </Space>
+        );
+      },
+    },
   ];
    // 准备表格body数据
   const data = [
@@ -90,18 +96,40 @@ const Article = () => {
      },
   ];
   //获取文章列表
+  const [reqData, setReqData] = useState({
+    status: "",
+    channel_id: "",
+    begin_pubdate: "",
+    end_pubdate: "",
+    page: 1,
+    per_page: 4,
+  });
+
   const [list,setList] = useState([])
   const [count,setCount] = useState(0)
-  useEffect( ()=>{
-    const getArticleList = async ()=>{
-      const res = await getArticleAPI()
-      setList(res.data.results)
-      setCount(res.data.total_count)
-    }
-    getArticleList()
-  },[]) 
+  useEffect(() => {
+    const getArticleList = async () => {
+      const res = await getArticleAPI(reqData);
+      setList(res.data.results);
+      setCount(res.data.total_count);
+    };
+    getArticleList();
+  }, [reqData]); 
    // 获取频道列表
   const {channelList} = useChannel()
+  // 筛选
+  // 参数
+
+  const onFinish = (value) => {
+    console.log(value);
+    setReqData({
+      ...reqData,
+      channel_id:value.channel_id,
+      status:value.status,
+      begin_pubdate:value.date[0].format('YYYY-MM-DD'),
+      end_pubdate:value.date[1].format('YYYY-MM-DD')
+    })
+  }
   return (
     <div>
       <Card
@@ -115,7 +143,7 @@ const Article = () => {
         }
         style={{ marginBottom: 20 }}
       >
-        <Form initialValues={{ status: "" }}>
+        <Form initialValues={{ status: "" }} onFinish={onFinish}>
           <Form.Item label="状态" name="status">
             <Radio.Group>
               <Radio value={""}>全部</Radio>
@@ -150,7 +178,6 @@ const Article = () => {
       </Card>
       {/* 表格 */}
       <Card title={`根据筛选条件共查询到${count} 条结果：`}>
-
         <Table rowKey="id" columns={columns} dataSource={list} />
       </Card>
     </div>
