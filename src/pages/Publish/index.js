@@ -62,12 +62,16 @@ const Publish = () => {
         title: res.data.title,
         channel_id: res.data.channel_id,
         content: res.data.content,
-        type:res.data.cover.type
+        type:res.data.cover.type,
+        
       });
+      setImageType(res.data.cover.type)
+      setImageList(res.data.cover.images.map(url=>{
+        return {url}
+      }))
     }
     getArticle()
-    
-  }, [id]);
+  }, [id,form]);
   return (
     <div className="publish">
       <Card
@@ -123,6 +127,7 @@ const Publish = () => {
                 name="image"
                 onChange={onChange}
                 maxCount={imageType}
+                fileList={imageList}
               >
                 <div style={{ marginTop: 8 }}>
                   <PlusOutlined />
