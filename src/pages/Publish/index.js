@@ -11,12 +11,12 @@ import {
   message,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import "./index.scss";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useState } from "react";
-import { createArticleAPI } from "@/apis/article";
+import { useEffect, useState } from "react";
+import { createArticleAPI, getArticleById } from "@/apis/article";
 import { useChannel } from "@/hooks/useChannel";
 const { Option } = Select;
 
@@ -38,18 +38,36 @@ const Publish = () => {
     };
     await createArticleAPI(reqData);
   };
-
   // 封面上传
   const [imageList,setImageList] = useState([])
   const onChange = (value) => {
     setImageList(value.fileList)
   }
-
   // 封面类型切换
   const [imageType,setImageType] = useState(0)
   const onTypeChange = (value) =>{ 
     setImageType(value.target.value);
   }
+  // 编辑文章
+  //获取
+  const [form] = Form.useForm();
+  const [searchParams] = useSearchParams()
+  const id = searchParams.get("id")
+  console.log(id);
+  useEffect(() => {
+    const getArticle = async () => {
+      const res = await getArticleById(id); 
+      console.log(res)
+      form.setFieldsValue({
+        title: res.data.title,
+        channel_id: res.data.channel_id,
+        content: res.data.content,
+        type:res.data.cover.type
+      });
+    }
+    getArticle()
+    
+  }, [id]);
   return (
     <div className="publish">
       <Card
@@ -67,6 +85,7 @@ const Publish = () => {
           wrapperCol={{ span: 16 }}
           initialValues={{ type: 0 }}
           onFinish={onFinish}
+          form={form}
         >
           <Form.Item
             label="标题"
