@@ -16,7 +16,7 @@ import "./index.scss";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useEffect, useState } from "react";
-import { createArticleAPI, getArticleById } from "@/apis/article";
+import { createArticleAPI, getArticleById,updateArticleAPI } from "@/apis/article";
 import { useChannel } from "@/hooks/useChannel";
 const { Option } = Select;
 
@@ -25,53 +25,71 @@ const Publish = () => {
   const { channelList } = useChannel();
   // 提交文章表单
   const onFinish = async (values) => {
-    if(imageType !== imageList.length) return message.error("封面图片与数量不匹配");
-    const {title,content,channel_id} = values
+    if (imageType !== imageList.length)
+      return message.error("封面图片与数量不匹配");
+    const { title, content, channel_id } = values;
     const reqData = {
       title,
       content,
       cover: {
         type: imageType,
-        images: imageList.map((item) => item.response.data.url),
+        images: imageList.map((item) => {
+          if(item.response)
+            return item.response.data.url
+          else {
+            return item.url
+          }
+        }),
       },
       channel_id,
     };
-    await createArticleAPI(reqData);
+    if(id){
+      await updateArticleAPI({...reqData,id})
+    }else{
+      await createArticleAPI(reqData);
+    }
+    // 发布文章
+    
+    // 更新文章
+    
   };
   // 封面上传
-  const [imageList,setImageList] = useState([])
+  const [imageList, setImageList] = useState([]);
   const onChange = (value) => {
-    setImageList(value.fileList)
-  }
+    setImageList(value.fileList);
+  };
   // 封面类型切换
-  const [imageType,setImageType] = useState(0)
-  const onTypeChange = (value) =>{ 
+  const [imageType, setImageType] = useState(0);
+  const onTypeChange = (value) => {
     setImageType(value.target.value);
-  }
+  };
   // 编辑文章
   //获取
   const [form] = Form.useForm();
-  const [searchParams] = useSearchParams()
-  const id = searchParams.get("id")
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
   console.log(id);
   useEffect(() => {
     const getArticle = async () => {
-      const res = await getArticleById(id); 
-      console.log(res)
+      const res = await getArticleById(id);
+      console.log(res);
       form.setFieldsValue({
         title: res.data.title,
         channel_id: res.data.channel_id,
         content: res.data.content,
-        type:res.data.cover.type,
-        
+        type: res.data.cover.type,
       });
-      setImageType(res.data.cover.type)
-      setImageList(res.data.cover.images.map(url=>{
-        return {url}
-      }))
+      setImageType(res.data.cover.type);
+      setImageList(
+        res.data.cover.images.map((url) => {
+          return  {url} ;
+        })
+      );
+    };
+    if (id) {
+      getArticle();
     }
-    getArticle()
-  }, [id,form]);
+  }, [id, form]);
   return (
     <div className="publish">
       <Card
@@ -79,7 +97,7 @@ const Publish = () => {
           <Breadcrumb
             items={[
               { title: <Link to={"/"}>首页</Link> },
-              { title: "发布文章" },
+              { title: id ? "编辑文章" : "发布文章" },
             ]}
           />
         }

@@ -28,7 +28,7 @@ export function getArticleAPI(params) {
 //删除文章
 export function deleteArticleAPI(id) {
   return request({
-    url: `mp/articles/${id}`,
+    url: `/mp/articles/${id}`,
     method: "DELETE",
   });
 }
@@ -36,7 +36,15 @@ export function deleteArticleAPI(id) {
 //
 export function getArticleById(id) {
   return request({
-    url: `mp/articles/${id}`,
-    // method: "PUT",
+    url: `/mp/articles/${id}`,
+    method: "GET",
+  });
+}
+
+export function updateArticleAPI(data) {
+  return request({
+    url: `/mp/articles/${data.id}?draft=false`,
+    method: "PUT",
+    data: data,
   });
 }
