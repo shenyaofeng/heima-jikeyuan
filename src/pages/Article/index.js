@@ -114,6 +114,7 @@ const Article = () => {
       setCount(res.data.total_count);
     };
     getArticleList();
+    //reqData发生变化 重新请求文章列表,作为依赖项
   }, [reqData]); 
    // 获取频道列表
   const {channelList} = useChannel()
@@ -128,6 +129,13 @@ const Article = () => {
       status:value.status,
       begin_pubdate:value.date[0].format('YYYY-MM-DD'),
       end_pubdate:value.date[1].format('YYYY-MM-DD')
+    })
+  }
+  // 分页
+  const onPageChange = (page) => {
+    setReqData({
+      ...reqData,
+      page:page
     })
   }
   return (
@@ -159,7 +167,9 @@ const Article = () => {
               style={{ width: 120 }}
             >
               {channelList.map((item) => (
-                <Option key={item.id} value="item.id">{item.name}</Option>
+                <Option key={item.id} value="item.id">
+                  {item.name}
+                </Option>
               ))}
             </Select>
           </Form.Item>
@@ -178,7 +188,11 @@ const Article = () => {
       </Card>
       {/* 表格 */}
       <Card title={`根据筛选条件共查询到${count} 条结果：`}>
-        <Table rowKey="id" columns={columns} dataSource={list} />
+        <Table rowKey="id" columns={columns} dataSource={list} pagination={{
+          total:count,
+          pageSize:reqData.per_page,
+          onChange:onPageChange
+        }}/>
       </Card>
     </div>
   );
