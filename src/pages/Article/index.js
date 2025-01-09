@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   Breadcrumb,
@@ -11,15 +11,17 @@ import {
 import locale from "antd/es/date-picker/locale/zh_CN";
 import {useChannel}from "@/hooks/useChannel";
 // 导入资源
-import { Table, Tag, Space } from 'antd'
+import { Table, Tag, Space, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import img404 from '@/assets/error.png'
 import { useEffect, useState } from "react";
-import {getArticleAPI}from '@/apis/article'
+import { getArticleAPI, deleteArticleAPI } from "@/apis/article";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Article = () => {
+  //
+  const navigate = useNavigate()
   //文章状态
   const status = {
     1:<Tag color="warning">待审核</Tag>,
@@ -68,13 +70,24 @@ const Article = () => {
       render: (data) => {
         return (
           <Space size="middle">
-            <Button type="primary" shape="circle" icon={<EditOutlined />} />
-            <Button
-              type="primary"
-              danger
-              shape="circle"
-              icon={<DeleteOutlined />}
-            />
+            <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={() => navigate(`/publish?id=${data.id}`)}/>
+            <Popconfirm
+              title="Delete the task"
+              description="Are you sure to delete this task?"
+              onConfirm={() => confirm(data)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                type="primary"
+                danger
+                shape="circle"
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  console.log("删除");
+                }}
+              />
+            </Popconfirm>
           </Space>
         );
       },
@@ -120,7 +133,6 @@ const Article = () => {
   const {channelList} = useChannel()
   // 筛选
   // 参数
-
   const onFinish = (value) => {
     console.log(value);
     setReqData({
@@ -138,6 +150,14 @@ const Article = () => {
       page:page
     })
   }
+  // 删除
+  const confirm = async (data) => {
+    console.log(data);
+    await deleteArticleAPI(data.id)
+    setReqData({
+      ...reqData
+    })
+  };
   return (
     <div>
       <Card
