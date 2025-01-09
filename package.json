@@ -2,6 +2,7 @@
   "name": "react-jikeyuan",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
     "antd": "^5.0.0",
